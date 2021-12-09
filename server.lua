@@ -9,17 +9,21 @@ RegisterServerEvent('qb-dumpsters:server:rewarditem')
 AddEventHandler('qb-dumpsters:server:rewarditem', function(listKey)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    for i = 1, #Config.Items, 1 do
-        local item = Config.Items[math.random(1, #Config.Items)]
-        Player.Functions.AddItem(item, math.random(3, 5))
-        TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item], 'add')
+    local item = math.random(1, #Config.Items)
+    for k,v in pairs(Config.Items) do
+        if item == k then
+            Player.Functions.AddItem(v, Config.ItemAmount)
+            TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[v], 'add')
+        end
     end
-    local Luck = math.random(1, 8)
-    local Odd = math.random(1, 8)
-    if Luck == Odd then
-        local random = math.random(1, 3)
-        Player.Functions.AddItem("rubber", random)
-        TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items["rubber"], 'add')
+
+    if Config.AddtionalItem then
+        local Luck = math.random(1, 8)
+        local Odd = math.random(1, 8)
+        if Luck == Odd then
+            Player.Functions.AddItem(Config.AddItem, Config.AddItemAmount)
+            TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[Config.AddItem], 'add')
+        end
     end
 end)
 
