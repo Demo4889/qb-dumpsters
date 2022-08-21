@@ -1,30 +1,32 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
-RegisterServerEvent('qb-dumpsters:startdumpsterTimer')
-AddEventHandler('qb-dumpsters:startdumpsterTimer', function(dumpster)
-    startTimer(source, dumpster)
-end)
-
-RegisterServerEvent('qb-dumpsters:server:rewarditem')
-AddEventHandler('qb-dumpsters:server:rewarditem', function(listKey)
+RegisterNetEvent('qb-dumpsters:server:rewarditem', function(dumpster)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    local item = math.random(1, #Config.Items)
-    for k,v in pairs(Config.Items) do
-        if item == k then
-            Player.Functions.AddItem(v, Config.ItemAmount)
-            TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[v], 'add')
+    local rItem = math.random(1, #Config.Items)
+    local addItem = math.random(1, #Config.AdditionalItems)
+
+    for _,item in pairs(Config.Items) do
+        if _ == rItem then
+            local itemReward = item
+            print("rewarding random item", json.encode(itemReward))
+            Player.Functions.AddItem(itemReward.item, itemReward.amount)
+            TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[itemReward.item], 'add')
         end
     end
 
     if Config.AddtionalItem then
-        local Luck = math.random(1, 8)
-        local Odd = math.random(1, 8)
-        if Luck == Odd then
-            Player.Functions.AddItem(Config.AddItem, Config.AddItemAmount)
-            TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[Config.AddItem], 'add')
+        for _,items in pairs(Config.AdditionalItems) do
+            if _ == addItem then
+                local addItemReward = items
+                print("additional item reward", json.encode(addItemReward))
+                Player.Functions.AddItem(addItemReward.item, addItemReward.amount)
+                TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[addItemReward.item], 'add')
+            end
         end
     end
+
+    startTimer(src, dumpster)
 end)
 
 function startTimer(id, object)
@@ -34,7 +36,7 @@ function startTimer(id, object)
         Wait(1000)
         timer = timer - 1000
         if timer == 0 then
-            TriggerClientEvent('qb-dumpsters:removedumpster', id, object)
+            TriggerClientEvent('qb-dumpsters:client:removedumpster', id, object)
         end
     end
 end
